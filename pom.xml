@@ -83,8 +83,24 @@
     <netty.boringssl.version>2.0.7.Final</netty.boringssl.version>
     <netty.version>4.1.24.Final</netty.version>
     <zookeeper.version>3.4.13</zookeeper.version>
+    <nexus-iotbull-lib-repo-url>http://nexus.iotbull.com:8081/nexus/content/repositories/iotbull-lib-repo/</nexus-iotbull-lib-repo-url>
+    <nexus-snapshots-url>http://nexus.iotbull.com:8081/nexus/content/repositories/snapshots</nexus-snapshots-url>
+    <nexus-release-url>http://nexus.iotbull.com:8081/nexus/content/repositories/releases</nexus-release-url>
+    <nexus-release-id>nexus-release</nexus-release-id>
+    <nexus-snapshots-id>nexus-snapshots</nexus-snapshots-id>
   </properties>
-
+  <distributionManagement>
+		<repository>
+			<id>${nexus-release-id}</id>
+			<url>${nexus-release-url}</url>
+		</repository>
+		<snapshotRepository>
+			<id>${nexus-snapshots-id}</id>
+			<name>User Project Snapshot</name>
+			<url>${nexus-snapshots-url}</url>
+			<uniqueVersion>true</uniqueVersion>
+		</snapshotRepository>
+  </distributionManagement>
   <name>ServiceComb Saga</name>
   <description>Eventual consistency component for distributed systems</description>
   <url>https://github.com/apache/servicecomb-saga</url>
