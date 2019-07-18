@@ -21,9 +21,15 @@ alpha:
   server:
     host: 0.0.0.0
     port: 8080
+  feature:
+    akka:
+      enabled: false
+      channel:
+        type: memory
   rest:
     cors:
       enabled: true  
+
 spring:
   datasource:
     initialization-mode: always
@@ -47,6 +53,13 @@ eureka:
     metadataMap:
       servicecomb-alpha-server: ${alpha.server.host}:${alpha.server.port}
 
+
+akkaConfig:
+  akka.persistence.journal.plugin: akka.persistence.journal.inmem
+  akka.persistence.journal.leveldb.dir: target/example/journal
+  akka.persistence.snapshot-store.plugin: akka.persistence.snapshot-store.local
+  akka.persistence.snapshot-store.local.dir: target/example/snapshots
+
 management:
   endpoints:
     web:
@@ -64,7 +77,7 @@ alpha:
       key: server.pem
       mutualAuth: true
       clientCert: client.crt
-    
+        
 ---
 spring:
   profiles: prd
@@ -92,3 +105,17 @@ spring:
     properties:
       eclipselink:
         ddl-generation: none
+
+---
+spring:
+  profiles: akka-persistence-redis
+akkaConfig:
+  akka.persistence.journal.plugin: akka-persistence-redis.journal
+  akka.persistence.snapshot-store.plugin: akka-persistence-redis.snapshot
+  akka-persistence-redis:
+    redis:
+      mode: simple
+      host: localhost
+      port: 6379
+      database: 0
+      #password:
