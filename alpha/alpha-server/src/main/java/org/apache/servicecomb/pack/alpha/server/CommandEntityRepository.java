@@ -23,6 +23,8 @@ import javax.persistence.LockModeType;
 import javax.transaction.Transactional;
 
 import org.apache.servicecomb.pack.alpha.core.Command;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -68,4 +70,16 @@ public interface CommandEntityRepository extends CrudRepository<Command, Long> {
       + " HAVING MAX( CASE c2.status WHEN 'PENDING' THEN 1 ELSE 0 END ) = 0) "
       + "ORDER BY c.eventId ASC LIMIT 1", nativeQuery = true)
   List<Command> findFirstGroupByGlobalTxIdWithoutPendingOrderByIdDesc();
+  
+  
+    
+  @Lock(LockModeType.OPTIMISTIC)
+  @Query(value = "SELECT * FROM Command AS c WHERE c.status ='PENDING'  ORDER BY c.surrogateId ASC",
+         countQuery = "SELECT count(*) FROM Command AS c WHERE c.status ='PENDING'",
+       nativeQuery = true)
+  Page<Command> findPendingServiceCommandsOrderById(Pageable pageable);
+  
+  
+  @Query(value = "SELECT count(*) FROM Command AS c WHERE c.status ='PENDING'", nativeQuery = true)
+  Integer findPendingServiceCommandsCount();
 }

@@ -27,5 +27,11 @@ public interface CommandRepository {
 
   List<Command> findUncompletedCommands(String globalTxId);
 
-  List<Command> findFirstCommandToCompensate();
+  List<Command> findFirstCommandToCompensate();  
+  
+  Command updateCommand(Command command);
+  
+  List<Command> findPendingServiceCommandsOrderById(int page, int pagesize);  
+  
+  Integer findPendingServiceCommandsCount();
 }

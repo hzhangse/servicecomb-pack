@@ -25,6 +25,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.servicecomb.pack.common.EventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +50,16 @@ public class TxConsistentService {
           event.type(), event.globalTxId());
       return false;
     }
-
-    eventRepository.save(event);
-
+    	//resend back when compensate failed
+		if (event.type().equalsIgnoreCase(EventType.TxCompensatedEvent.name())) {
+			//commandRepository.updateByGlobalTxIdAndLocalTxId(TaskStatus.PENDING.name(),event.payloads(),event.globalTxId(),event.localTxId());
+//			((PushBackOmegaCallback) omegaCallback).offerCompensateEvent(event);
+			//补偿事件入库幂等性判断，目前基于数据库判断，后续改进基于本地缓存过滤
+			int size = eventRepository.findDuplicateCompensatedEvent(event.localTxId(), event.globalTxId(),event.parentTxId()).size();
+			if (size <1) eventRepository.save(event);
+		}else{ 
+			eventRepository.save(event);
+	    }
     return true;
   }
 

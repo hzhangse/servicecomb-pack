@@ -25,6 +25,7 @@ import java.util.Optional;
 import org.apache.servicecomb.pack.alpha.core.TxEvent;
 import org.apache.servicecomb.pack.alpha.core.TxEventRepository;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.repository.query.Param;
 
 import kamon.annotation.EnableKamon;
 import kamon.annotation.Segment;
@@ -84,5 +85,10 @@ class SpringTxEventRepository implements TxEventRepository {
   public void deleteDuplicateEvents(String type) {
     eventRepo.findDuplicateEventsByType(type).forEach((txEvent) ->eventRepo.
             deleteBySurrogateId(txEvent.id()));
+  }
+  
+  @Override
+  public List<TxEvent> findDuplicateCompensatedEvent(String localTxId,String globalTxId,String parentTxId){
+	  return eventRepo.findDuplicateCompensatedEvent(localTxId, globalTxId,parentTxId);
   }
 }

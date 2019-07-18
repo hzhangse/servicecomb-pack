@@ -118,4 +118,6 @@ public interface TxEventRepository {
    * @param type event type
    */
   void deleteDuplicateEvents(String type);
+  
+  List<TxEvent> findDuplicateCompensatedEvent(String localTxId,String globalTxId,String parentTxId);
 }

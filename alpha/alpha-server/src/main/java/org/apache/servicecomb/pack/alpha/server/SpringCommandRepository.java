@@ -33,6 +33,8 @@ import org.apache.servicecomb.pack.alpha.core.CommandRepository;
 import org.apache.servicecomb.pack.alpha.core.TxEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import kamon.annotation.EnableKamon;
 import kamon.annotation.Segment;
@@ -40,7 +42,6 @@ import kamon.annotation.Segment;
 @EnableKamon
 public class SpringCommandRepository implements CommandRepository {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
   private final TxEventEnvelopeRepository eventRepository;
   private final CommandEntityRepository commandRepository;
 
@@ -98,6 +99,35 @@ public class SpringCommandRepository implements CommandRepository {
             command.globalTxId(),
             command.localTxId()));
 
-    return commands;
-  }
+		return commands;
+	}
+
+	
+
+	@Override
+	@Segment(name = "updateCommand", category = "application", library = "kamon")
+	public Command updateCommand(Command command) {
+		 Command result = commandRepository.save(command);
+		return result;	
+		
+	}
+
+	
+
+	@Override
+	@Transactional
+	@Segment(name = "findPendingServiceCommandsOrderById", category = "application", library = "kamon")
+	public List<Command> findPendingServiceCommandsOrderById(int pageindex,int pagesize) {
+		PageRequest TEN_CMD_REQUEST = new PageRequest(pageindex, pagesize);
+		Page<Command> page = commandRepository.findPendingServiceCommandsOrderById(TEN_CMD_REQUEST);
+		
+		return page.getContent();
+	}
+	
+	
+	@Override
+	@Segment(name = "findPendingServiceCommandsCount", category = "application", library = "kamon")
+	public Integer findPendingServiceCommandsCount() {
+		return commandRepository.findPendingServiceCommandsCount();
+	}
 }

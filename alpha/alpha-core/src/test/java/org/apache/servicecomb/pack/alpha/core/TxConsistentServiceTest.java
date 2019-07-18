@@ -85,6 +85,12 @@ public class TxConsistentServiceTest {
     @Override
     public void deleteDuplicateEvents(String type) {
     }
+
+	@Override
+	public List<TxEvent> findDuplicateCompensatedEvent(String localTxId, String globalTxId, String parentTxId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
   };
 
   private final String globalTxId = UUID.randomUUID().toString();

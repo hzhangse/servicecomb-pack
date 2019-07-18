@@ -47,6 +47,7 @@ public class PushBackOmegaCallback implements OmegaCallback {
       } catch (Exception e) {
         logError(event, e);
         pendingCompensations.offer(() -> compensate(event));
+        throw e;
       }
     }
   }

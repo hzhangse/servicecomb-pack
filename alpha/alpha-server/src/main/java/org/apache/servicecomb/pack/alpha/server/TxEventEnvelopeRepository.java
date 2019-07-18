@@ -27,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 public interface TxEventEnvelopeRepository extends CrudRepository<TxEvent, Long> {
   List<TxEvent> findByGlobalTxId(String globalTxId);
@@ -263,4 +264,13 @@ public interface TxEventEnvelopeRepository extends CrudRepository<TxEvent, Long>
   @Modifying(clearAutomatically = true)
   @Query("DELETE FROM TxEvent WHERE surrogateId = ?1 ")
   void deleteBySurrogateId(Long surrogateId);
+  
+  
+
+  @Query("SELECT t FROM TxEvent t "
+      + "WHERE t.type = 'TxCompensatedEvent'  "
+      + "  AND t.localTxId = :localTxId "
+      + "  AND t.parentTxId = :parentTxId "
+      + "  AND t.globalTxId = :globalTxId ")  
+  List<TxEvent> findDuplicateCompensatedEvent(@Param("localTxId")String localTxId,@Param("globalTxId")String globalTxId,@Param("parentTxId")String parentTxId);
 }

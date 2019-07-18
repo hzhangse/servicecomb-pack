@@ -24,14 +24,15 @@ import static org.apache.servicecomb.pack.common.EventType.TxEndedEvent;
 import static org.apache.servicecomb.pack.common.EventType.TxStartedEvent;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
-import kamon.annotation.EnableKamon;
-import kamon.annotation.Trace;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import kamon.annotation.EnableKamon;
+import kamon.annotation.Trace;
 
 @EnableKamon
 public class EventScanner implements Runnable {
@@ -92,6 +93,7 @@ public class EventScanner implements Runnable {
             abortTimeoutEvents();
             saveUncompensatedEventsToCommands();
             compensate();
+            compensatePendingCommand();
             updateCompensatedCommands();
             deleteDuplicateSagaEndedEvents();
             updateTransactionStatus();
@@ -101,7 +103,7 @@ public class EventScanner implements Runnable {
         eventPollingInterval,
         MILLISECONDS);
   }
-
+	
   @Trace("findTimeoutEvents")
   private void findTimeoutEvents() {
     eventRepository.findTimeoutEvents()
@@ -215,13 +217,49 @@ public class EventScanner implements Runnable {
   private void compensate() {
     commandRepository.findFirstCommandToCompensate()
         .forEach(command -> {
+        	doCompensate(command);
+        });
+  }
+  
+  
+  private void doCompensate(Command command) {  
           LOG.info("Compensating transaction with globalTxId {} and localTxId {}",
               command.globalTxId(),
               command.localTxId());
-
-          omegaCallback.compensate(txStartedEventOf(command));
-        });
+          try {
+        	 // command.setStatus(TaskStatus.PENDING.name());
+        	  TxEvent event = txStartedEventOf(command);
+              omegaCallback.compensate(event);
+             // command.setInstanceId(event.instanceId());
+          }catch(Exception ex){
+        	  
+        	  LOG.error("Compensating transaction with globalTxId {} and localTxId {}, throw ex: {}",
+                      command.globalTxId(),
+                      command.localTxId(),ex.getMessage());
+          }
+         // commandRepository.updateCommand(command);       
   }
+  
+	@Trace("compensatePendingCommand")
+	private void compensatePendingCommand() {
+		int total =  commandRepository.findPendingServiceCommandsCount();
+		int pagesize = 20;
+		int totalPages = total / pagesize;
+		if (total % pagesize != 0) {
+			totalPages++;
+		}
+		List<Integer> totalComandsByPage = new ArrayList<Integer>();
+		for (int i= 0; i<totalPages;i++) {
+			totalComandsByPage.add(i);
+		}
+		
+	
+		totalComandsByPage.parallelStream().forEach(i -> {
+			List<Command> commands = commandRepository.findPendingServiceCommandsOrderById(i, pagesize);
+			commands.parallelStream().forEach(command -> this.doCompensate(command));
+		});
+		
+	}
 
   private TxEvent txStartedEventOf(Command command) {
     return new TxEvent(
