@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option java_package = "org.apache.servicecomb.pack.demo.booking";
+
+// The greeter service definition.
+service BookingOrder {
+    // Sends a greeting
+    rpc order ( BookingRequest) returns (  BookingReply) {}
+
+}
+// The request message containing the user's name.
+message BookingRequest {
+    string name = 1;
+    int32 rooms = 2;
+    int32 cars = 3;
+}
+// The response message containing the greetings
+message BookingReply {
+     int32 id = 1;
+     string name = 2;
+     int32 amount = 3;
+     bool confirmed = 4;
+     bool cancelled = 5;
+}
+
+

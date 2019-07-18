@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option java_package = "org.apache.servicecomb.pack.demo.car";
+
+// The greeter service definition.
+service CarOrder {
+    // Sends a greeting
+    rpc order ( CarRequest) returns (  CarReply) {}
+
+}
+// The request message containing the user's name.
+message CarRequest {
+    string name = 1;
+    int32 rooms = 2;
+    int32 cars = 3;
+}
+// The response message containing the greetings
+message CarReply {
+     int32 id = 1;
+     string name = 2;
+     int32 amount = 3;
+     bool confirmed = 4;
+     bool cancelled = 5;
+}
+
+

@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option java_package = "org.apache.servicecomb.pack.demo.hotel";
+
+// The greeter service definition.
+service HotelOrder {
+    // Sends a greeting
+    rpc order ( HotelRequest) returns (  HotelReply) {}
+
+}
+// The request message containing the user's name.
+message HotelRequest {
+    string name = 1;
+    int32 rooms = 2;
+}
+// The response message containing the greetings
+message HotelReply {
+     int32 id = 1;
+     string name = 2;
+     int32 amount = 3;
+     bool confirmed = 4;
+     bool cancelled = 5;
+}
+
+
