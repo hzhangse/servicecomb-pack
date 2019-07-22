@@ -23,6 +23,8 @@ metadata:
   labels:
     app: alphaserver
 spec:
+  externalIPs:
+    - 192.168.10.128
   ports:
   - port: 8080
     name: alpha-http

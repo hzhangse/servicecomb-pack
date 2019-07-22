@@ -23,10 +23,15 @@ metadata:
   labels:
     app: car
 spec:
+  externalIPs:
+    - 192.168.10.128
   ports:
   - port: 8082
     targetPort: 8080
     name: car
+  - port: 9898
+    targetPort: 9898
+    name: car-grpc    
   selector:
     app: car
 ---
@@ -45,11 +50,11 @@ spec:
     spec:
       containers:
       - name: car
-        image: registry.cn-hangzhou.aliyuncs.com/rainbow954/car:0.5.0-SNAPSHOT
-        imagePullPolicy: IfNotPresent
+        image: registry.cn-hangzhou.aliyuncs.com/iotbull/car-grpc:0.5.0-SNAPSHOT
+        imagePullPolicy: Always
         env:
         - name: JAVA_OPTS
-          value: -Dalpha.cluster.address=alpha-server:8080  -Dhotel.service.address=http://hotel:8081
+          value: -Dalpha.cluster.address=alpha-server:8080 -Dgrpc.client.hotel-grpc-server.host=hotel -Dhotel.service.address=http://hotel:8081
         ports:
         - containerPort: 8080
 ---

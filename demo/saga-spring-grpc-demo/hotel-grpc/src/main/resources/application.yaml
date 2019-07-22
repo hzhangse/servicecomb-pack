@@ -25,8 +25,7 @@ spring:
 alpha:
   cluster:
     address: alpha-server:8080
-    register:
-      type: zookeeper
+
       
 grpc:
   server:

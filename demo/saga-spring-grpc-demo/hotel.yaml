@@ -23,10 +23,15 @@ metadata:
   labels:
     app: hotel
 spec:
+  externalIPs:
+    - 192.168.10.128
   ports:
   - port: 8081
     targetPort: 8080
     name: hotel
+  - port: 9899
+    targetPort: 9899
+    name: hotel-grpc    
   selector:
     app: hotel
 ---
@@ -45,7 +50,7 @@ spec:
     spec:
       containers:
       - name: hotel
-        image: registry.cn-hangzhou.aliyuncs.com/rainbow954/hotel:0.5.0-SNAPSHOT
+        image: registry.cn-hangzhou.aliyuncs.com/iotbull/hotel-grpc:0.5.0-SNAPSHOT
         imagePullPolicy: Always
         env:
         - name: JAVA_OPTS
